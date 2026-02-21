@@ -1,0 +1,64 @@
+[project]
+name = "claude-slack-bot"
+version = "0.1.0"
+description = "A Slack bot that triggers Claude Code on your Mac Mini via @mention"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "slack-bolt>=1.21.0",
+]
+
+[project.scripts]
+claude-slack-bot = "claude_slack_bot.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app/claude_slack_bot"]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.11.0",
+    "pytest>=8.0.0",
+    "ruff>=0.6.0",
+]
+
+[tool.ruff]
+src = ["app"]
+line-length = 88
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "D",   # pydocstyle
+]
+ignore = [
+    "D100",  # no module-level docstrings (per project guidelines)
+    "D104",  # no package-level docstrings
+    "D202",  # allow blank line after docstring (per project guidelines)
+    "D200",  # allow multi-line form for short docstrings (per project guidelines)
+    "D212",  # summary on second line after opening """ (per project guidelines)
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["D"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
