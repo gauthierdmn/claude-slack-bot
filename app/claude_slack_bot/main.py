@@ -74,7 +74,8 @@ async def _async_main() -> None:
     app: AsyncApp = AsyncApp(token=config.slack_bot_token)
     register_handlers(app, config, session_store, session_queue)
     handler: AsyncSocketModeHandler = AsyncSocketModeHandler(
-        app, config.slack_app_token,
+        app,
+        config.slack_app_token,
     )
 
     logger.info("Bot is running, waiting for mentions...")
