@@ -49,7 +49,7 @@ class Config:
         slack_app_token: str = _require_env("SLACK_APP_TOKEN")
 
         user_ids: str = _require_env("SLACK_ALLOWED_USERS")
-        allowed_user_ids: frozenset = frozenset(
+        allowed_user_ids: frozenset[str] = frozenset(
             uid.strip() for uid in user_ids.split(",") if uid.strip()
         )
 
@@ -85,7 +85,7 @@ def _require_env(key: str) -> str:
         OSError: If the variable is unset or empty.
     """
 
-    value: str = os.environ.get(key)
+    value: str | None = os.environ.get(key)
 
     if not value:
         raise OSError(f"Required environment variable '{key}' is not set")
