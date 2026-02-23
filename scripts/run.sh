@@ -1,6 +1,6 @@
 #!/bin/bash
-# Wrapper script for launchd — activates the venv and starts the bot.
-# Edit the env vars below or export them from a secrets manager.
+# Wrapper script — activates the venv and starts the bot.
+# Export the required env vars before running, or edit them below.
 
 set -euo pipefail
 
@@ -13,11 +13,6 @@ source "$PROJECT_ROOT/.venv/bin/activate"
 # Required environment variables
 export SLACK_BOT_TOKEN="${SLACK_BOT_TOKEN:?SLACK_BOT_TOKEN is not set}"
 export SLACK_APP_TOKEN="${SLACK_APP_TOKEN:?SLACK_APP_TOKEN is not set}"
-export ALLOWED_SLACK_USER_IDS="${ALLOWED_SLACK_USER_IDS:?ALLOWED_SLACK_USER_IDS is not set}"
-export PROJECT_PATH="${PROJECT_PATH:?PROJECT_PATH is not set}"
+export SLACK_ALLOWED_USERS="${SLACK_ALLOWED_USERS:?SLACK_ALLOWED_USERS is not set}"
 
-# Optional
-export CLAUDE_TIMEOUT_SECONDS="${CLAUDE_TIMEOUT_SECONDS:-300}"
-
-exec python -m claude_slack_bot.main
-
+exec python -m claude_slack_bot.main "$@"

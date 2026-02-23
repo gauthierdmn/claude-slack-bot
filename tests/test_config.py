@@ -1,3 +1,4 @@
+# type: ignore
 import os
 from unittest.mock import patch
 
@@ -13,7 +14,7 @@ def env_vars():
     return {
         "SLACK_BOT_TOKEN": "xoxb-test-token",
         "SLACK_APP_TOKEN": "xapp-test-token",
-        "SLACK_ADMIN_USER": "U001,U002",
+        "SLACK_ALLOWED_USERS": "U001,U002",
     }
 
 
@@ -26,15 +27,15 @@ class TestFromEnv:
         assert config.slack_app_token == "xapp-test-token"
         assert config.allowed_user_ids == frozenset({"U001", "U002"})
         assert config.project_path == TEST_PROJECT_PATH
-        assert config.claude_timeout_seconds == 300
+        assert config.max_turns == 0
 
-    def test_from_env_custom_timeout(self, env_vars):
-        env_vars["CLAUDE_TIMEOUT_SECONDS"] = "60"
+    def test_from_env_custom_max_turns(self, env_vars):
+        env_vars["CLAUDE_MAX_TURNS"] = "10"
 
         with patch.dict(os.environ, env_vars, clear=False):
             config = Config.from_env(TEST_PROJECT_PATH)
 
-        assert config.claude_timeout_seconds == 60
+        assert config.max_turns == 10
 
     def test_from_env_missing_bot_token_raises(self, env_vars):
         del env_vars["SLACK_BOT_TOKEN"]
@@ -51,7 +52,7 @@ class TestFromEnv:
                 Config.from_env(TEST_PROJECT_PATH)
 
     def test_from_env_empty_user_ids_raises(self, env_vars):
-        env_vars["SLACK_ADMIN_USER"] = "  ,  , "
+        env_vars["SLACK_ALLOWED_USERS"] = "  ,  , "
 
         with patch.dict(os.environ, env_vars, clear=False):
             with pytest.raises(ValueError, match="at least one user ID"):
@@ -65,9 +66,23 @@ class TestFromEnv:
         assert config.project_path.endswith("/my-project")
 
     def test_from_env_strips_whitespace_from_user_ids(self, env_vars):
-        env_vars["SLACK_ADMIN_USER"] = " U001 , U002 "
+        env_vars["SLACK_ALLOWED_USERS"] = " U001 , U002 "
 
         with patch.dict(os.environ, env_vars, clear=False):
             config = Config.from_env(TEST_PROJECT_PATH)
 
         assert config.allowed_user_ids == frozenset({"U001", "U002"})
+
+    def test_from_env_default_claude_model_empty(self, env_vars):
+        with patch.dict(os.environ, env_vars, clear=False):
+            config = Config.from_env(TEST_PROJECT_PATH)
+
+        assert config.claude_model == ""
+
+    def test_from_env_custom_claude_model(self, env_vars):
+        env_vars["CLAUDE_MODEL"] = "claude-sonnet-4-6"
+
+        with patch.dict(os.environ, env_vars, clear=False):
+            config = Config.from_env(TEST_PROJECT_PATH)
+
+        assert config.claude_model == "claude-sonnet-4-6"
