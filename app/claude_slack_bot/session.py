@@ -121,8 +121,6 @@ class SessionQueue:
                     "Job failed for session %s",
                     key,
                 )
-            finally:
-                queue.task_done()
 
         del self._queues[key]
         del self._consumers[key]
