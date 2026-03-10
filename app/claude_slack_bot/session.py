@@ -33,7 +33,7 @@ class SessionStore:
             str | None: The session ID, or None if no session exists.
         """
 
-        return self._sessions.get((channel, thread_ts))
+        return self._sessions.get((channel, thread_ts)
 
     def set(self, channel: str, thread_ts: str, session_id: str) -> None:
         """
@@ -121,8 +121,6 @@ class SessionQueue:
                     "Job failed for session %s",
                     key,
                 )
-            finally:
-                queue.task_done()
 
         del self._queues[key]
         del self._consumers[key]
